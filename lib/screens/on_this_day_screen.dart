@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/quake.dart';
 import '../providers/history_provider.dart';
 import '../providers/quake_provider.dart';
+import '../widgets/offline_banner.dart';
 import '../widgets/quake_card.dart';
 import 'quake_detail_screen.dart';
 
@@ -58,8 +59,22 @@ class _OnThisDayScreenState extends State<OnThisDayScreen> {
           ],
         ),
       ),
-      body: Consumer<HistoryProvider>(
-        builder: (context, provider, _) {
+      body: Consumer2<HistoryProvider, QuakeProvider>(
+        builder: (context, provider, quakeProvider, _) {
+          return Column(
+            children: [
+              if (quakeProvider.isOffline) const OfflineBanner(),
+              Expanded(
+                child: _buildBody(context, provider),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context, HistoryProvider provider) {
           if (provider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -148,8 +163,5 @@ class _OnThisDayScreenState extends State<OnThisDayScreen> {
               },
             ),
           );
-        },
-      ),
-    );
   }
 }

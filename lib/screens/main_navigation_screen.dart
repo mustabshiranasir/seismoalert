@@ -3,6 +3,7 @@ import 'home_feed_screen.dart';
 import 'map_screen.dart';
 import 'on_this_day_screen.dart';
 import 'contacts_screen.dart';
+import 'settings_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -18,7 +19,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     HomeFeedScreen(),
     MapScreen(),
     OnThisDayScreen(),
-    ContactsScreen(),
+    EmergencyContactsScreen(),
+    SettingsScreen(),
   ];
 
   @override
@@ -40,20 +42,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         unselectedItemColor: Colors.grey.shade600,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.list),
+            icon: Icon(Icons.format_list_bulleted),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.map),
+            icon: Icon(Icons.map_outlined),
             label: 'Map',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.today),
+            icon: Icon(Icons.history_edu_outlined),
             label: 'On This Day',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.contacts),
+            icon: Icon(Icons.contact_phone_outlined),
             label: 'Contacts',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_outlined),
+            label: 'Settings',
           ),
         ],
       ),
