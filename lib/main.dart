@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'models/quake.dart';
 import 'models/emergency_contact.dart';
 import 'providers/quake_provider.dart';
+import 'providers/aftershock_provider.dart';
+import 'providers/history_provider.dart';
 import 'screens/main_navigation_screen.dart';
 
 void main() async {
@@ -20,6 +22,7 @@ void main() async {
   // Open Hive boxes
   await Hive.openBox<Quake>('quake_cache');
   await Hive.openBox<EmergencyContact>('emergency_contacts');
+  await Hive.openBox('history_cache'); // generic box for JSON-encoded history
 
   runApp(const MyApp());
 }
@@ -32,6 +35,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => QuakeProvider()),
+        ChangeNotifierProvider(create: (_) => AftershockProvider()),
+        ChangeNotifierProvider(create: (_) => HistoryProvider()),
         // Placeholders to add more providers in later phases:
         // ChangeNotifierProvider(create: (_) => EmergencyContactProvider()),
       ],
