@@ -1,113 +1,79 @@
-# SeismoAlert 🌍
+# SeismoAlert
 
-**SeismoAlert** is a Flutter mobile application for real-time earthquake monitoring, built as a complete end-to-end project covering live feed, interactive map, offline caching, historical data, emergency contacts, and local push notifications.
+A Flutter application for real-time earthquake monitoring, built for Pakistan and surrounding regions using the USGS Earthquake Hazards API.
 
 ---
 
-## 📱 Features
+## Features
 
-| Module | Description |
+- **Live Feed** — Recent earthquakes fetched from USGS, filterable by magnitude, with pull-to-refresh
+- **Interactive Map** — OpenStreetMap view with magnitude-scaled, color-coded markers and a quick-detail bottom sheet
+- **Quake Detail** — Full earthquake info with automatic aftershock detection (7-day / 200 km window)
+- **On This Day** — Historical earthquakes on today's date across the past 10 years, grouped by year
+- **Emergency Contacts** — Save contacts with one-tap call and pre-filled SMS shortcuts; swipe to delete with undo
+- **Push Notifications** — Local alert when a newly fetched quake meets or exceeds a configurable magnitude threshold
+- **Settings** — Switch between 5 Pakistani city regions; adjust notification threshold (M2.5–M7.0); all settings persisted
+- **Offline Mode** — Cached data loads automatically when offline; an offline banner is shown across all screens
+
+---
+
+## Tech Stack
+
+| Package | Purpose |
 |---|---|
-| **Live Feed** | Fetches recent earthquakes near a selected region from the USGS API, with magnitude filter (All / M2.5+ / M4.0+ / M5.5+ / M7.0+) and pull-to-refresh |
-| **Interactive Map** | flutter_map powered OpenStreetMap view with magnitude-scaled, color-coded markers; tap a marker for a quick summary sheet |
-| **Quake Detail** | Full detail page per earthquake (magnitude, depth, location, time, USGS link) with automatic aftershock detection in a 7-day / 200 km window |
-| **On This Day** | Historical lookup showing earthquakes that occurred on today's calendar date in each of the past 10 years, grouped by year in collapsible tiles |
-| **Emergency Contacts** | Save/edit/delete contacts with name, phone, and relation; one-tap call (`tel:`) and pre-filled SMS (`sms:`) shortcuts; swipe-to-delete with undo |
-| **Local Notifications** | `flutter_local_notifications` fires a device alert for any **newly fetched** quake whose magnitude meets or exceeds a configurable threshold |
-| **Settings** | Region selection (Islamabad, Karachi, Lahore, Peshawar, Quetta), notification magnitude threshold slider (M2.5–M7.0), all persisted via Hive |
-| **Offline Mode** | All fetched quakes are cached in Hive; the app loads cached data automatically when offline and shows an OfflineBanner across all relevant screens |
+| `provider` | State management (ChangeNotifier) |
+| `hive` / `hive_flutter` | Local persistence & offline caching |
+| `flutter_map` | Interactive map with OpenStreetMap tiles |
+| `flutter_local_notifications` | Device push notifications |
+| `connectivity_plus` | Online/offline detection |
+| `url_launcher` | `tel:` and `sms:` deep links |
+| `http` | USGS REST API calls |
+| `intl` | Date/time formatting |
+
+Data source: [USGS Earthquake Hazards Program](https://earthquake.usgs.gov/fdsnws/event/1/)
 
 ---
 
-## 🛠 Tech Stack
-
-| Technology | Role |
-|---|---|
-| **Flutter** | Cross-platform UI framework |
-| **Provider** | State management (ChangeNotifier pattern) |
-| **USGS Earthquake Hazards API** | Live seismic data source (GeoJSON, free & open) |
-| **Hive / hive_flutter** | Fast local key-value persistence for offline caching & settings |
-| **flutter_map** | Interactive map widget powered by OpenStreetMap tiles |
-| **flutter_local_notifications** | Trigger device-level push notifications for significant quakes |
-| **connectivity_plus** | Detect online/offline state at runtime |
-| **url_launcher** | Launch `tel:` and `sms:` URIs for emergency contact actions |
-| **intl** | Date/time formatting |
-
----
-
-## ⚙️ How Offline Caching Works
-
-1. On each successful USGS API call, `QuakeProvider` clears and re-writes the `quake_cache` Hive box with the latest list of `Quake` objects (serialised via `QuakeAdapter`).
-2. Emergency contacts are stored in the `emergency_contacts` Hive box (keyed by contact ID).
-3. "On This Day" results are cached in the `history_cache` box under the key `yyyy-MM-dd` (today's date), preventing redundant API calls within the same day.
-4. Settings (alert threshold, selected region lat/lon) are also persisted in `history_cache` under fixed keys so they survive app restarts.
-5. If `connectivity_plus` reports no connection, all providers fall back to their Hive boxes and the OfflineBanner is displayed.
-
----
-
-## 🚀 How to Run
-
-### Prerequisites
-- Flutter SDK ≥ 3.12 (`flutter --version`)
-- A connected Android device or emulator
-
-### Steps
+## Getting Started
 
 ```bash
-# 1. Clone the repo
 git clone <repo-url>
 cd seismoalert
-
-# 2. Fetch dependencies
 flutter pub get
-
-# 3. Run on a connected device / emulator
 flutter run
+```
 
-# 4. (Optional) Build a debug APK
+To build a debug APK:
+```bash
 flutter build apk --debug
 ```
 
-> **Note:** The app fetches live data from `https://earthquake.usgs.gov`. Ensure the device has internet access on first launch to populate the cache.
+> Requires Flutter SDK ≥ 3.12 and a connected Android device or emulator.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 lib/
-├── main.dart                      # Entry point, Hive init, Provider setup
-├── models/
-│   ├── quake.dart                 # Quake model + Hive adapter
-│   └── emergency_contact.dart     # EmergencyContact model + Hive adapter
-├── providers/
-│   ├── quake_provider.dart        # Live feed, filtering, notifications
-│   ├── aftershock_provider.dart   # Aftershock detection
-│   ├── history_provider.dart      # On This Day historical lookup
-│   └── contacts_provider.dart     # Emergency contacts CRUD
-├── screens/
-│   ├── main_navigation_screen.dart
-│   ├── home_feed_screen.dart
-│   ├── map_screen.dart
-│   ├── quake_detail_screen.dart
-│   ├── on_this_day_screen.dart
-│   ├── contacts_screen.dart       # EmergencyContactsScreen
-│   └── settings_screen.dart
-├── services/
-│   ├── usgs_service.dart          # HTTP calls to USGS FDSNWS API
-│   └── notification_service.dart  # Local push notification wrapper
-└── widgets/
-    ├── quake_card.dart
-    ├── magnitude_badge.dart
-    └── offline_banner.dart
+├── main.dart
+├── models/          # Quake, EmergencyContact (with Hive adapters)
+├── providers/       # QuakeProvider, AftershockProvider, HistoryProvider, ContactsProvider
+├── screens/         # HomeFeed, Map, QuakeDetail, OnThisDay, Contacts, Settings
+├── services/        # UsgsService, NotificationService
+└── widgets/         # QuakeCard, MagnitudeBadge, OfflineBanner
 ```
 
 ---
 
-## ⚠️ Known Limitations & TODOs
+## How Offline Caching Works
 
-- **No background fetch**: Notifications only fire when the app is open and `QuakeProvider.fetchQuakes()` is called (pull-to-refresh or region change). Background periodic polling would require a platform plugin (e.g., `workmanager`).
-- **iOS notification permissions**: On iOS the user must explicitly grant notification permissions; the app handles this via `DarwinInitializationSettings` but does not proactively prompt at startup.
-- **Map tiles offline**: OpenStreetMap tiles are not cached locally; the map background will not render when offline (markers from cached data will still plot correctly once tiles are fetched at least once).
-- **Hive box for settings reuses `history_cache`**: In a future version this should be separated into a dedicated `settings` box for clarity.
-- **No pagination**: The USGS query is capped at 50 results (`limit=50`). Infinite scroll / pagination is a future enhancement.
+On every successful API call, fetched quakes are written to a Hive box (`quake_cache`). "On This Day" results are cached per calendar date. Settings (region, alert threshold) are also persisted in Hive. When connectivity is unavailable, all providers fall back to their cached data automatically.
+
+---
+
+## Known Limitations
+
+- Notifications only fire while the app is open (no background fetch)
+- OpenStreetMap tiles are not cached; the map background requires connectivity
+- Results are capped at 50 earthquakes per query (no pagination)
