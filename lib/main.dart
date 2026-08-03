@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 import 'models/quake.dart';
 import 'models/emergency_contact.dart';
+import 'providers/quake_provider.dart';
+import 'screens/main_navigation_screen.dart';
 
 void main() async {
   // Ensure Flutter binding is initialized
@@ -26,47 +29,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SeismoAlert',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
-      ),
-      home: const SetupCompleteScreen(),
-    );
-  }
-}
-
-class SetupCompleteScreen extends StatelessWidget {
-  const SetupCompleteScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('SeismoAlert'),
-        centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.check_circle_outline,
-              color: Colors.teal,
-              size: 64,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'SeismoAlert - Setup Complete',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => QuakeProvider()),
+        // Placeholders to add more providers in later phases:
+        // ChangeNotifierProvider(create: (_) => EmergencyContactProvider()),
+      ],
+      child: MaterialApp(
+        title: 'SeismoAlert',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+          useMaterial3: true,
         ),
+        home: const MainNavigationScreen(),
       ),
     );
   }
